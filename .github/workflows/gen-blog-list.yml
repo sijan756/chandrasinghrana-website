@@ -1,0 +1,34 @@
+name: Generate Blog Index
+
+on:
+  push:
+    branches:
+      - main  # Trigger workflow on every push to main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Workflow VM
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        # Pulls your repo files into the workflow VM
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+        # Python is needed to run the blog-generation script
+
+      - name: Generate Blog Index
+        run: python3 scripts/generate_blog_index.py
+        # Runs the Python script to auto-create blog homepage
+
+      - name: Commit & Push
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@github.com"
+          git add blog/index.html
+          git commit -m "Auto-update blog index [skip ci]" || echo "No changes to commit"
+          git push
+        # Automatically commits and pushes updated blog homepage back to repo
